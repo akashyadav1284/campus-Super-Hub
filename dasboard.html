@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Campus Super Hub (Frontend Only)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #020617;
+      --bg-alt: #020617;
+      --surface: #020617;
+      --card: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.1);
+      --accent-strong: rgba(56, 189, 248, 0.3);
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --danger: #f97373;
+      --success: #22c55e;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
+      --transition-fast: 150ms ease-out;
+      --transition-med: 220ms ease-out;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937, #020617 55%);
+      color: var(--text);
+    }
+
+    .app {
+      min-height: 100vh;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 14px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(130deg, #020617, #020617);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .header-left h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 2px 0 0;
+      font-size: 0.83rem;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .toggle input {
+      accent-color: var(--accent);
+    }
+
+    /* Navigation */
+
+    .main-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .nav-btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      padding: 6px 12px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: background var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast),
+        border-color var(--transition-fast);
+    }
+
+    .nav-btn:hover {
+      color: var(--text);
+      background: rgba(15, 23, 42, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .nav-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(56, 189, 248, 0.6);
+    }
+
+    /* Layout */
+
+    .app-main {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 16px 14px 18px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section h2 {
+      margin: 0 0 4px;
+      font-size: 1.15rem;
+    }
+
+    .section-subtitle {
+      margin: 0 0 14px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .layout-two-cols {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr);
+      gap: 14px;
+    }
+
+    .layout-three-cols {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #0f172a, #020617 55%);
+      border-radius: var(--radius-md);
+      padding: 12px 12px 14px;
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-med),
+        box-shadow var(--transition-med),
+        border-color var(--transition-med),
+        background var(--transition-med);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at top left,
+        rgba(56, 189, 248, 0.2),
+        transparent 60%
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-med);
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.85);
+      border-color: rgba(56, 189, 248, 0.7);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card h3 {
+      margin: 0 0 4px;
+      font-size: 0.98rem;
+    }
+
+    .card-desc {
+      margin: 0 0 6px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .pill-soft {
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      font-size: 0.83rem;
+      cursor: pointer;
+      transition: background var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #0b1120;
+      font-weight: 500;
+    }
+
+    .btn.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn.secondary {
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .btn.secondary:hover {
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+
+    .chip {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--transition-fast),
+        color var(--transition-fast),
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
+      white-space: nowrap;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .chip.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(56, 189, 248, 0.7);
+    }
+
+    .chip.badge {
+      border-radius: 999px;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      background: rgba(22, 163, 74, 0.08);
+      border-color: rgba(22, 163, 74, 0.6);
+      color: #bbf7d0;
+    }
+
+    .rating-stars {
+      display: inline-flex;
+      gap: 2px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .rating-stars span {
+      filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.5));
+    }
+
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .stat-pill {
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 999px;
+      padding: 3px 9px;
+      border: 1px solid rgba(51, 65, 85, 0.8);
+    }
+
+    .textarea {
+      width: 100%;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      color: var(--text);
+      padding: 8px 10px;
+      margin: 8px 0;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 0.84rem;
+    }
+
+    .summary-box {
+      padding: 8px;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px dashed rgba(148, 163, 184, 0.5);
+      min-height: 70px;
+      font-size: 0.88rem;
+    }
+
+    .list {
+      margin: 6px 0 0;
+      padding-left: 16px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .list li + li {
+      margin-top: 2px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+      font-size: 0.74rem;
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--text-muted);
+    }
+
+    .badge.alert {
+      border-color: rgba(248, 113, 113, 0.8);
+      color: #fecaca;
+      background: rgba(248, 113, 113, 0.12);
+    }
+
+    .badge.ok {
+      border-color: rgba(52, 211, 153, 0.8);
+      color: #bbf7d0;
+      background: rgba(34, 197, 94, 0.12);
+    }
+
+    .timeline {
+      margin-top: 6px;
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      padding: 8px 10px;
+      font-size: 0.84rem;
+    }
+
+    .timeline-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .timeline-row + .timeline-row {
+      border-top: 1px solid rgba(31, 41, 55, 0.8);
+    }
+
+    .tag {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .link-row {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.78rem;
+    }
+
+    .link-pill {
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--accent);
+      cursor: pointer;
+    }
+
+    .app-footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .layout-two-cols {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .app {
+        padding: 12px 10px 22px;
+      }
+
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .main-nav {
+        margin-top: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1>Campus Super Hub</h1>
+        <p class="subtitle">By students · For students · Frontend-only prototype</p>
+        <div class="main-nav">
+          <button class="nav-btn active" data-section="home">Home</button>
+          <button class="nav-btn" data-section="mess">Mess & Emails</button>
+          <button class="nav-btn" data-section="exchange">Student Exchange</button>
+          <button class="nav-btn" data-section="explore">Explorer&apos;s Guide</button>
+          <button class="nav-btn" data-section="timetable">Timetable</button>
+          <button class="nav-btn" data-section="safety">Safety & Analytics</button>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="pill" id="headerWeather">24°C · Cloudy · Ropar</div>
+        <label class="toggle">
+          <input type="checkbox" id="darkModeToggle" checked />
+          Dark mode
+        </label>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="app-main">
+      <!-- HOME -->
+      <section id="home" class="section active">
+        <h2>Today&apos;s Snapshot</h2>
+        <p class="section-subtitle">
+          Live mess preview, announcements, events, and quick status — everything important at a glance.
+        </p>
+        <div class="layout-two-cols">
+          <div class="card">
+            <h3>Live Mess Preview</h3>
+            <p class="card-desc">
+              Dynamic daily menu with instant filters and ratings (see full details under Mess & Emails).
+            </p>
+            <div id="homeMessPreview" class="summary-box">
+              Loading mess menu...
+            </div>
+            <div class="stat-row">
+              <span class="stat-pill" id="homeMessRating">Avg rating: –</span>
+              <span class="stat-pill">Next meal: Dinner</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Announcements & Alerts</h3>
+            <p class="card-desc">Campus-wide updates from academics, hostel, and clubs.</p>
+            <ul id="announcementList" class="list"></ul>
+            <div class="badge-row">
+              <span class="badge alert">Emergency: None</span>
+              <span class="badge ok" id="statusWifi">WiFi: Stable</span>
+              <span class="badge ok" id="statusPower">Power: OK</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="layout-two-cols" style="margin-top:12px;">
+          <div class="card">
+            <h3>Event Countdown</h3>
+            <p class="card-desc">Stay ahead of important campus milestones.</p>
+            <div class="timeline" id="eventCountdown">
+              Loading events...
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Personalized Feed (Demo)</h3>
+            <p class="card-desc">A preview of how your news and updates can be personalized.</p>
+            <ul class="list" id="personalizedFeed">
+              <!-- Filled by JS -->
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- MESS & EMAILS -->
+      <section id="mess" class="section">
+        <h2>Core Pillars · Mess & Mail</h2>
+        <p class="section-subtitle">
+          Live Mess Menu with dietary filters and ratings, plus an email summarizer that turns long emails into short action items.
+        </p>
+        <div class="layout-two-cols">
+          <!-- Mess -->
+          <div class="card">
+            <h3>Live Mess Menu</h3>
+            <p class="card-desc">
+              Filter by preferences, view today&apos;s meals, and rate items to crowd‑source feedback.
+            </p>
+
+            <div class="chip-row" id="dietFilterRow">
+              <span class="chip active" data-filter="all">All</span>
+              <span class="chip" data-filter="veg">Veg</span>
+              <span class="chip" data-filter="nonveg">Non‑Veg</span>
+              <span class="chip" data-filter="vegan">Vegan</span>
+              <span class="chip" data-filter="spicy">Spicy</span>
+            </div>
+
+            <div class="chip-row" id="mealTabs">
+              <span class="chip active" data-meal="breakfast">Breakfast</span>
+              <span class="chip" data-meal="lunch">Lunch</span>
+              <span class="chip" data-meal="snacks">Snacks</span>
+              <span class="chip" data-meal="dinner">Dinner</span>
+            </div>
+
+            <div class="summary-box" id="messListBox">
+              Loading meals...
+            </div>
+
+            <p class="small-note">
+              Click the stars to rate a dish. This demo keeps ratings only while the page is open.
+            </p>
+          </div>
+
+          <!-- Emails -->
+          <div class="card">
+            <h3>Mail Summarizer (Frontend Demo)</h3>
+            <p class="card-desc">
+              Paste any lengthy college-wide email and condense it into 1–2 line action items or notices.
+            </p>
+            <textarea
+              id="emailInput"
+              rows="9"
+              class="textarea"
+              placeholder="Paste the full email text here..."
+            ></textarea>
+            <button class="btn primary" id="summarizeBtn">Summarize Email</button>
+            <p class="small-note">
+              Uses rule-based keyword detection (deadlines, exams, forms, etc.) to mimic AI summarization in the browser.
+            </p>
+            <div class="summary-box" id="emailOutput">
+              No summary yet.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STUDENT EXCHANGE -->
+      <section id="exchange" class="section">
+        <h2>The Student Exchange</h2>
+        <p class="section-subtitle">
+          Marketplace and collaboration hub: Lost & Found, Buy/Sell, Travel Sharing, and skill exchange.
+        </p>
+        <div class="layout-three-cols">
+          <div class="card">
+            <h3>Lost &amp; Found</h3>
+            <p class="card-desc">
+              Report missing items, upload images, and see potential matches suggested visually.
+            </p>
+            <ul class="list" id="lostFoundList">
+              <!-- JS items -->
+            </ul>
+            <div class="link-row">
+              <span class="link-pill">+ Report lost item</span>
+              <span class="link-pill">+ Report found item</span>
+            </div>
+            <p class="small-note">
+              Future AI: detect item type from photo, group duplicates, notify when matches appear.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Buy/Sell Marketplace</h3>
+            <p class="card-desc">
+              One place for textbooks, electronics, furniture, cycles, and more.
+            </p>
+            <ul class="list" id="marketList"></ul>
+            <div class="chip-row">
+              <span class="chip">Textbooks</span>
+              <span class="chip">Electronics</span>
+              <span class="chip">Room Setup</span>
+              <span class="chip">Cycles</span>
+            </div>
+            <p class="small-note">
+              Future AI: price recommendations, condition estimation from photos, negotiation helpers, and semester‑end bundles.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Travel Sharing · Cab Pool</h3>
+            <p class="card-desc">
+              Match rides for Chandigarh, Delhi, and beyond, with cost split and safety shortcuts.
+            </p>
+            <ul class="list" id="travelList"></ul>
+            <div class="badge-row">
+              <span class="badge">Cost split calc</span>
+              <span class="badge">Ratings</span>
+              <span class="badge">Emergency contact</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <h3>Skill &amp; Service Exchange</h3>
+          <p class="card-desc">
+            Peer tutoring, service bartering, group‑buys, shared subscriptions, and rentals — all in one place.
+          </p>
+          <div class="cards-grid" id="skillCards">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPLORER'S GUIDE -->
+      <section id="explore" class="section">
+        <h2>The Explorer&apos;s Guide</h2>
+        <p class="section-subtitle">
+          Discover Ropar/Rupnagar hotspots, eateries, and hidden study corners with vibe‑based reviews.
+        </p>
+        <div class="layout-two-cols">
+          <div class="card">
+            <h3>Nearby Hub</h3>
+            <p class="card-desc">
+              Curated directory of student-friendly places with vibes, price hints, and quick tags.
+            </p>
+            <div class="chip-row" id="nearbyFilter">
+              <span class="chip active" data-type="all">All</span>
+              <span class="chip" data-type="food">Food</span>
+              <span class="chip" data-type="study">Study</span>
+              <span class="chip" data-type="fun">Fun</span>
+              <span class="chip" data-type="essentials">Essentials</span>
+            </div>
+            <ul class="list" id="nearbyList"></ul>
+          </div>
+
+          <div class="card">
+            <h3>Smart Suggestions (Demo)</h3>
+            <p class="card-desc">
+              Example of how recommendation systems can adapt to time, mood, and history.
+            </p>
+            <div class="summary-box" id="suggestionBox">
+              Loading suggestions...
+            </div>
+            <p class="small-note">
+              In a full version, this would use behavior data, sentiment, and preferences for personalization.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TIMETABLE -->
+      <section id="timetable" class="section">
+        <h2>Live Timetable</h2>
+        <p class="section-subtitle">
+          Personal schedule overview with class blocks, cancellations, and countdown to exams.
+        </p>
+        <div class="layout-two-cols">
+          <div class="card">
+            <h3>Today&apos;s Schedule</h3>
+            <p class="card-desc">
+              A simple linear view of classes, labs, and club events.
+            </p>
+            <div class="timeline" id="todaySchedule"></div>
+            <div class="stat-row">
+              <span class="stat-pill" id="examCountdown">Exam in – days</span>
+              <span class="stat-pill">Attendance check‑in: On</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Future Ideas</h3>
+            <p class="card-desc">
+              How analytics and AI can enhance your timetable.
+            </p>
+            <ul class="list">
+              <li>Predict course difficulty and suggest ideal study slots.</li>
+              <li>Auto‑block revision sessions before exams.</li>
+              <li>Forecast grades from attendance + assignment patterns.</li>
+              <li>Chatbot to navigate timetable and answer “When is my next class?”</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SAFETY & ANALYTICS -->
+      <section id="safety" class="section">
+        <h2>Safety, Integrations &amp; Insights</h2>
+        <p class="section-subtitle">
+          Emergency shortcuts, smart integrations, and basic analytics to understand your campus life.
+        </p>
+        <div class="layout-three-cols">
+          <div class="card">
+            <h3>Safety &amp; Security</h3>
+            <p class="card-desc">
+              Quick access to SOS, security contacts, and anonymous reporting.
+            </p>
+            <button class="btn primary">Emergency SOS</button>
+            <div class="list" style="margin-top:8px;">
+              <li>Campus Security: +91-99999 99999</li>
+              <li>Warden on Duty: +91-88888 88888</li>
+              <li>Local Police: 100</li>
+            </div>
+            <div class="link-row">
+              <span class="link-pill">Safe walk companion</span>
+              <span class="link-pill">Anonymous report</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Smart Integrations</h3>
+            <p class="card-desc">
+              Example toggles for calendar sync, storage, and notifications.
+            </p>
+            <ul class="list">
+              <li><input type="checkbox" checked /> Sync with Google Calendar</li>
+              <li><input type="checkbox" /> Sync with Outlook</li>
+              <li><input type="checkbox" checked /> Push notifications</li>
+              <li><input type="checkbox" /> Auto backup to cloud</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Data &amp; Analytics (Demo)</h3>
+            <p class="card-desc">
+              Tiny dashboard to preview how insights might look.
+            </p>
+            <ul class="list" id="analyticsList">
+              <!-- Filled by JS -->
+            </ul>
+            <p class="small-note">
+              Imagine full dashboards with course load charts, marketplace trends, and anonymized campus mood tracking.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      © 2026 Campus Super Hub · Pure HTML/CSS/JS · No backend, no database
+    </footer>
+  </div>
+
+  <script>
+    // -------- NAVIGATION --------
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const sections = document.querySelectorAll('.section');
+
+    navBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.section;
+        navBtns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        sections.forEach((sec) => {
+          sec.classList.toggle('active', sec.id === target);
+        });
+      });
+    });
+
+    // -------- DARK MODE TOGGLE (visual only) --------
+    const darkToggle = document.getElementById('darkModeToggle');
+    darkToggle.addEventListener('change', () => {
+      if (darkToggle.checked) {
+        document.body.style.background =
+          'radial-gradient(circle at top, #1f2937, #020617 55%)';
+      } else {
+        document.body.style.background =
+          'radial-gradient(circle at top, #e5e7eb, #111827 60%)';
+      }
+    });
+
+    // -------- MOCK DATA --------
+    const messData = {
+      breakfast: [
+        { name: 'Poha', tags: ['veg'], baseRating: 4.2, votes: 120 },
+        { name: 'Boiled Eggs', tags: ['nonveg', 'high-protein'], baseRating: 4.0, votes: 80 },
+        { name: 'Masala Tea', tags: ['veg'], baseRating: 4.5, votes: 200 },
+      ],
+      lunch: [
+        { name: 'Dal Makhani', tags: ['veg'], baseRating: 4.4, votes: 190 },
+        { name: 'Jeera Rice', tags: ['veg'], baseRating: 4.1, votes: 160 },
+        { name: 'Chicken Curry', tags: ['nonveg', 'spicy'], baseRating: 4.0, votes: 90 },
+      ],
+      snacks: [
+        { name: 'Samosa', tags: ['veg', 'spicy'], baseRating: 4.3, votes: 210 },
+        { name: 'Cold Coffee', tags: ['veg'], baseRating: 4.6, votes: 180 },
+      ],
+      dinner: [
+        { name: 'Paneer Butter Masala', tags: ['veg'], baseRating: 4.5, votes: 220 },
+        { name: 'Roti', tags: ['veg'], baseRating: 4.2, votes: 230 },
+        { name: 'Gulab Jamun', tags: ['veg'], baseRating: 4.7, votes: 250 },
+      ],
+    };
+
+    const announcements = [
+      'Exam form submission closes on 10 Feb, 5 PM.',
+      'Tech Fest: Hackathon begins in 2 days at Innovation Block.',
+      'Hostel B mess will serve special Punjabi thali on Sunday night.',
+    ];
+
+    const events = [
+      { title: 'AI Fusion Hackathon', daysLeft: 2 },
+      { title: 'Mid-Sem Exams', daysLeft: 15 },
+      { title: 'Cultural Night', daysLeft: 7 },
+    ];
+
+    const lostFoundItems = [
+      'Lost: Black HP laptop in Library · Reward: ₹500',
+      'Found: Red water bottle near Block 3 stairs',
+      'Lost: LPU ID card near BH-2, name: Arjun Singh',
+    ];
+
+    const marketItems = [
+      'CSE 2nd year DSA textbook · ₹250 · Very good condition',
+      'Used bicycle (Hero) · ₹2500 · Hostel BH-4',
+      'Mini fridge · ₹3000 · Perfect for room sharing',
+    ];
+
+    const travelItems = [
+      'Cab to Chandigarh · 4 PM today · 2 seats left',
+      'Delhi airport run · Tonight 11 PM · 3 seats',
+      'Ropar railway station · Tomorrow 8 AM · 1 seat left',
+    ];
+
+    const skillItems = [
+      'Teach: Python basics · Looking for: UI design tips',
+      'Guitar lessons · Trade for: Math tutoring',
+      'Graphic design for club posters · Reward: snacks / coffee',
+      'Shared Netflix + Spotify subscription group (4/5 filled)',
+    ];
+
+    const nearbyPlaces = [
+      { name: 'Chai Corner', type: 'food', vibe: 'Chill · Budget · Late-night' },
+      { name: 'Riverfront Ghat', type: 'fun', vibe: 'Sunset · Peaceful' },
+      { name: 'Quiet Study Café', type: 'study', vibe: 'Calm · WiFi · Coffee' },
+      { name: 'Stationery & Print Shop', type: 'essentials', vibe: 'Fast prints · Cheap copies' },
+      { name: 'Campus Ground', type: 'fun', vibe: 'Sports · Open air' },
+    ];
+
+    const timetableToday = [
+      { time: '9:00–10:00', title: 'CSE201 · Data Structures', room: 'B-304' },
+      { time: '10:00–11:00', title: 'MA101 · Calculus', room: 'A-102' },
+      { time: '2:00–4:00', title: 'CSE Lab · DS Lab', room: 'Lab-5' },
+      { time: '5:00–6:00', title: 'Coding Club Meet', room: 'Innovation Hub' },
+    ];
+
+    // -------- HOME FILLERS --------
+    const homeMessPreview = document.getElementById('homeMessPreview');
+    const homeMessRating = document.getElementById('homeMessRating');
+    const announcementList = document.getElementById('announcementList');
+    const eventCountdown = document.getElementById('eventCountdown');
+    const personalizedFeed = document.getElementById('personalizedFeed');
+
+    function initHome() {
+      // Mess preview: show first item of each meal
+      const previewLines = [];
+      ['breakfast', 'lunch', 'dinner'].forEach((meal) => {
+        const arr = messData[meal];
+        if (arr && arr.length > 0) {
+          previewLines.push(
+            meal[0].toUpperCase() +
+              meal.slice(1) +
+              ': ' +
+              arr[0].name
+          );
+        }
+      });
+      homeMessPreview.textContent = previewLines.join(' · ') || 'No menu set.';
+
+      // Simple avg rating
+      let total = 0;
+      let count = 0;
+      Object.values(messData).forEach((arr) => {
+        arr.forEach((dish) => {
+          total += dish.baseRating;
+          count++;
+        });
+      });
+      const avg = count ? (total / count).toFixed(1) : '–';
+      homeMessRating.textContent = 'Avg rating: ' + avg;
+
+      announcementList.innerHTML = '';
+      announcements.forEach((a) => {
+        const li = document.createElement('li');
+        li.textContent = a;
+        announcementList.appendChild(li);
+      });
+
+      eventCountdown.innerHTML = '';
+      events.forEach((e) => {
+        const row = document.createElement('div');
+        row.className = 'timeline-row';
+        row.innerHTML = `<span>${e.title}</span><span>${e.daysLeft} days</span>`;
+        eventCountdown.appendChild(row);
+      });
+
+      personalizedFeed.innerHTML = '';
+      ['Because you liked coding events', 'Based on your hostel', 'Trending on campus'].forEach(
+        (reason, idx) => {
+          const li = document.createElement('li');
+          if (idx === 0) {
+            li.textContent = reason + ': "AI Fusion Hackathon" · Register today.';
+          } else if (idx === 1) {
+            li.textContent = reason + ': BH-3 movie night tomorrow.';
+          } else {
+            li.textContent = reason + ': Campus meme page collab contest.';
+          }
+          personalizedFeed.appendChild(li);
+        }
+      );
+    }
+
+    // -------- MESS RENDERING --------
+    const dietFilterRow = document.getElementById('dietFilterRow');
+    const mealTabs = document.getElementById('mealTabs');
+    const messListBox = document.getElementById('messListBox');
+
+    let currentMeal = 'breakfast';
+    let currentDietFilter = 'all';
+    const ratingOverrides = {}; // { "meal-name": rating }
+
+    function renderMessList() {
+      const dishes = messData[currentMeal] || [];
+      messListBox.innerHTML = '';
+      const filtered = dishes.filter((dish) => {
+        if (currentDietFilter === 'all') return true;
+        if (currentDietFilter === 'veg') return dish.tags.includes('veg');
+        if (currentDietFilter === 'nonveg') return dish.tags.includes('nonveg');
+        if (currentDietFilter === 'vegan') return dish.tags.includes('vegan');
+        if (currentDietFilter === 'spicy') return dish.tags.includes('spicy');
+        return true;
+      });
+
+      if (!filtered.length) {
+        messListBox.textContent = 'No items match this filter.';
+        return;
+      }
+
+      filtered.forEach((dish) => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.padding = '4px 0';
+
+        const left = document.createElement('div');
+        left.innerHTML = `<strong>${dish.name}</strong><br/><span style="font-size:0.75rem;color:#9ca3af;">Tags: ${dish.tags.join(
+          ', '
+        ) || 'none'}</span>`;
+
+        const right = document.createElement('div');
+        const key = currentMeal + '-' + dish.name;
+        const base = dish.baseRating;
+        const override = ratingOverrides[key];
+        const showRating = (override ?? base).toFixed(1);
+
+        right.innerHTML = `
+          <div style="font-size:0.78rem;color:#9ca3af;text-align:right;">${showRating} ★ (${dish.votes}+)</div>
+          <div class="rating-stars" data-key="${key}">
+            <span data-val="1">★</span>
+            <span data-val="2">★</span>
+            <span data-val="3">★</span>
+            <span data-val="4">★</span>
+            <span data-val="5">★</span>
+          </div>
+        `;
+
+        row.appendChild(left);
+        row.appendChild(right);
+        messListBox.appendChild(row);
+      });
+
+      // Add listeners for rating stars
+      messListBox.querySelectorAll('.rating-stars span').forEach((star) => {
+        star.addEventListener('click', () => {
+          const parent = star.parentElement;
+          const key = parent.dataset.key;
+          const val = Number(star.dataset.val);
+          ratingOverrides[key] = val;
+          renderMessList(); // re-render to update displayed rating
+        });
+      });
+    }
+
+    dietFilterRow.querySelectorAll('.chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const filter = chip.dataset.filter;
+        currentDietFilter = filter;
+        dietFilterRow.querySelectorAll('.chip').forEach((c) =>
+          c.classList.remove('active')
+        );
+        chip.classList.add('active');
+        renderMessList();
+      });
+    });
+
+    mealTabs.querySelectorAll('.chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const meal = chip.dataset.meal;
+        currentMeal = meal;
+        mealTabs.querySelectorAll('.chip').forEach((c) =>
+          c.classList.remove('active')
+        );
+        chip.classList.add('active');
+        renderMessList();
+      });
+    });
+
+    // -------- EMAIL SUMMARIZER --------
+    const emailInput = document.getElementById('emailInput');
+    const emailOutput = document.getElementById('emailOutput');
+    const summarizeBtn = document.getElementById('summarizeBtn');
+
+    
+
+    summarizeBtn.addEventListener('click', async () => {
+  const text = (emailInput.value || '').trim();
+
+  if (!text) {
+    emailOutput.textContent = 'Please paste an email first.';
+    return;
+  }
+
+  emailOutput.textContent = 'AI is summarizing...';
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/summarize", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ text: text })
+    });
+
+    const data = await response.json();
+
+    let color = "#64748b";
+    if (data.category === "Academic") color = "#2563eb";
+    if (data.category === "Urgent") color = "#dc2626";
+    if (data.category === "Event") color = "#16a34a";
+
+    emailOutput.innerHTML =
+      "<strong>Summary:</strong> " + data.summary +
+      "<br><br><span style='background:" + color +
+      "; padding:6px 12px; border-radius:8px;'>"
+      + data.category + "</span>";
+
+  } catch (error) {
+    emailOutput.textContent = "Could not connect to AI server.";
+  }
+});
+
+
+    // -------- STUDENT EXCHANGE FILLERS --------
+    document.getElementById('lostFoundList').innerHTML = lostFoundItems
+      .map((i) => `<li>${i}</li>`)
+      .join('');
+
+    document.getElementById('marketList').innerHTML = marketItems
+      .map((i) => `<li>${i}</li>`)
+      .join('');
+
+    document.getElementById('travelList').innerHTML = travelItems
+      .map((i) => `<li>${i}</li>`)
+      .join('');
+
+    const skillCards = document.getElementById('skillCards');
+    skillItems.forEach((item) => {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <h3>Offer &amp; Need</h3>
+        <p class="card-desc">${item}</p>
+        <p class="small-note">Tap to open detailed profile in a full version.</p>
+      `;
+      skillCards.appendChild(div);
+    });
+
+    // -------- EXPLORER'S GUIDE FILLERS --------
+    const nearbyFilter = document.getElementById('nearbyFilter');
+    const nearbyList = document.getElementById('nearbyList');
+    const suggestionBox = document.getElementById('suggestionBox');
+
+    let currentNearbyType = 'all';
+
+    function renderNearby() {
+      nearbyList.innerHTML = '';
+      const filtered = nearbyPlaces.filter((p) => {
+        if (currentNearbyType === 'all') return true;
+        return p.type === currentNearbyType;
+      });
+      if (!filtered.length) {
+        nearbyList.textContent = 'No places for this filter yet.';
+        return;
+      }
+      filtered.forEach((p) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${p.name}</strong> · <span style="font-size:0.78rem;color:#9ca3af;">${p.vibe}</span>`;
+        nearbyList.appendChild(li);
+      });
+    }
+
+    nearbyFilter.querySelectorAll('.chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        currentNearbyType = chip.dataset.type;
+        nearbyFilter.querySelectorAll('.chip').forEach((c) =>
+          c.classList.remove('active')
+        );
+        chip.classList.add('active');
+        renderNearby();
+      });
+    });
+
+    function initSuggestions() {
+      const hour = new Date().getHours();
+      let text = '';
+      if (hour < 11) {
+        text =
+          'Good morning! Suggested: Quiet Study Café for focused work, then Poha + Tea at mess.';
+      } else if (hour < 17) {
+        text =
+          'Afternoon vibes: Try Chai Corner for a break, or the Library + Riverfront Ghat if you need fresh air.';
+      } else {
+        text =
+          'Evening: Campus Ground for a walk or sports, then late-night chai with friends at Chai Corner.';
+      }
+      suggestionBox.textContent = text;
+    }
+
+    // -------- TIMETABLE FILLERS --------
+    const todaySchedule = document.getElementById('todaySchedule');
+    const examCountdown = document.getElementById('examCountdown');
+
+    function initTimetable() {
+      todaySchedule.innerHTML = '';
+      timetableToday.forEach((slot) => {
+        const row = document.createElement('div');
+        row.className = 'timeline-row';
+        row.innerHTML = `
+          <div>
+            <strong>${slot.time}</strong><br/>
+            <span style="font-size:0.78rem;color:#9ca3af;">${slot.title}</span>
+          </div>
+          <span class="tag">${slot.room}</span>
+        `;
+        todaySchedule.appendChild(row);
+      });
+
+      const daysLeft = events.find((e) => e.title.includes('Exam'))
+        ?.daysLeft;
+      examCountdown.textContent =
+        'Mid-Sem in ' + (daysLeft != null ? daysLeft : '–') + ' days';
+    }
+
+    // -------- ANALYTICS FILLERS --------
+    const analyticsList = document.getElementById('analyticsList');
+
+    function initAnalytics() {
+      const analytics = [
+        'Active days this week: 5/7',
+        'Most visited section: Student Exchange',
+        'Total marketplace listings this month: 42',
+        'Average mess rating this week: 4.3★',
+      ];
+      analyticsList.innerHTML = analytics
+        .map((a) => `<li>${a}</li>`)
+        .join('');
+    }
+
+    // -------- INIT --------
+    initHome();
+    renderMessList();
+    renderNearby();
+    initSuggestions();
+    initTimetable();
+    initAnalytics();
+  </script>
+</body>
+</html>
