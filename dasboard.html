@@ -481,7 +481,7 @@
     <header class="app-header">
       <div class="header-left">
         <h1>Campus Super Hub</h1>
-        <p class="subtitle">By students · For students · Frontend-only prototype</p>
+        <p class="subtitle">By students · For students · <a href="index.html" style="color:var(--accent);">Project Nexus Mail Summarizer</a></p>
         <div class="main-nav">
           <button class="nav-btn active" data-section="home">Home</button>
           <button class="nav-btn" data-section="mess">Mess & Emails</button>
@@ -610,6 +610,12 @@
             </p>
             <div class="summary-box" id="emailOutput">
               No summary yet.
+            </div>
+            <p class="small-note" style="margin-top:10px;">
+              Summaries are saved to the database. View recent ones below.
+            </p>
+            <div class="summary-box" id="recentSummariesBox" style="margin-top:8px; max-height:180px; overflow-y:auto;">
+              Loading recent summaries...
             </div>
           </div>
         </div>
@@ -807,7 +813,7 @@
 
     <!-- FOOTER -->
     <footer class="app-footer">
-      © 2026 Campus Super Hub · Pure HTML/CSS/JS · No backend, no database
+      © 2026 Campus Super Hub · Backend + MySQL database connected
     </footer>
   </div>
 
@@ -1118,8 +1124,33 @@
   } catch (error) {
     emailOutput.textContent = "Could not connect to AI server.";
   }
+  loadRecentSummaries();
 });
 
+    async function loadRecentSummaries() {
+      const box = document.getElementById('recentSummariesBox');
+      if (!box) return;
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/summaries?limit=10');
+        const data = await res.json();
+        const list = data.summaries || [];
+        if (list.length === 0) {
+          box.innerHTML = data.error ? 'Database not set up. Run <code>python init_db.py</code>.' : 'No summaries yet. Summarize an email to save one.';
+          return;
+        }
+        box.innerHTML = list.map((s) => {
+          const cat = (s.category || 'General').toLowerCase();
+          let color = '#64748b';
+          if (cat === 'academic') color = '#2563eb';
+          if (cat === 'urgent') color = '#dc2626';
+          if (cat === 'event') color = '#16a34a';
+          return `<div style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid rgba(148,163,184,0.2);"><span style="background:${color}; padding:2px 8px; border-radius:6px; font-size:0.72rem;">${s.category}</span><br/><span style="font-size:0.86rem;">${(s.summary || '').slice(0, 120)}${(s.summary && s.summary.length > 120) ? '…' : ''}</span></div>`;
+        }).join('');
+      } catch (e) {
+        box.textContent = 'Start the API (uvicorn main:app --reload) to see recent summaries.';
+      }
+    }
+    loadRecentSummaries();
 
     // -------- STUDENT EXCHANGE FILLERS --------
     document.getElementById('lostFoundList').innerHTML = lostFoundItems
