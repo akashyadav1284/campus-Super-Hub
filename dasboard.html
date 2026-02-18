@@ -818,6 +818,14 @@
   </div>
 
   <script>
+    // -------- API BASE --------
+    function getApiBase() {
+      if (window.location.protocol === 'file:') {
+        return 'http://127.0.0.1:8000';
+      }
+      return window.API_BASE_URL || window.location.origin;
+    }
+
     // -------- NAVIGATION --------
     const navBtns = document.querySelectorAll('.nav-btn');
     const sections = document.querySelectorAll('.section');
@@ -1100,7 +1108,8 @@
   emailOutput.textContent = 'AI is summarizing...';
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/summarize", {
+    const base = getApiBase();
+    const response = await fetch(base + "/api/summarize", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -1131,7 +1140,8 @@
       const box = document.getElementById('recentSummariesBox');
       if (!box) return;
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/summaries?limit=10');
+        const base = getApiBase();
+        const res = await fetch(base + '/api/summaries?limit=10');
         const data = await res.json();
         const list = data.summaries || [];
         if (list.length === 0) {

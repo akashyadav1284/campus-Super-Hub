@@ -1,13 +1,19 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
+
 from summarizer import summarize_email
 from db import get_connection
 
+BASE_DIR = Path(__file__).resolve().parent
+
 app = FastAPI()
-from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,9 +29,37 @@ class EmailRequest(BaseModel):
     text: str
 
 
-@app.get("/")
-def home():
-    return {"message": "AI Mail Summarizer API is running"}
+@app.get("/", response_class=HTMLResponse)
+def serve_index():
+    """Serve the main Project Nexus Mail Summarizer UI."""
+    index_path = BASE_DIR / "index.html"
+    return FileResponse(index_path)
+
+
+@app.get("/dasboard.html", response_class=HTMLResponse)
+def serve_dashboard():
+    """Serve the Campus Super Hub dashboard UI."""
+    dashboard_path = BASE_DIR / "dasboard.html"
+    return FileResponse(dashboard_path)
+
+
+@app.get("/style.css")
+def serve_style():
+    """Serve global stylesheet."""
+    css_path = BASE_DIR / "style.css"
+    return FileResponse(css_path, media_type="text/css")
+
+
+@app.get("/script.js")
+def serve_script():
+    """Serve main frontend script for the mail summarizer."""
+    js_path = BASE_DIR / "script.js"
+    return FileResponse(js_path, media_type="application/javascript")
+
+
+@app.get("/api/health")
+def api_health():
+    return {"status": "ok"}
 
 
 @app.get("/api/summaries")
