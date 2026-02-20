@@ -67,22 +67,22 @@ def list_summaries(limit: int = 50):
     """Return recent email summaries from the database."""
     try:
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor()
         cursor.execute(
             """
             SELECT id, subject, summary, category, priority, created_at
             FROM email_summaries
             ORDER BY created_at DESC
-            LIMIT %s
+            LIMIT ?
             """,
             (limit,),
         )
-        rows = cursor.fetchall()
+        rows = [dict(row) for row in cursor.fetchall()]
         cursor.close()
         conn.close()
         for row in rows:
             if row.get("created_at"):
-                row["created_at"] = row["created_at"].isoformat()
+                row["created_at"] = row["created_at"]
         return {"summaries": rows}
     except Exception as e:
         return {"summaries": [], "error": str(e)}
@@ -98,7 +98,7 @@ async def summarize(req: EmailRequest):
         cursor.execute(
             """
             INSERT INTO email_summaries (subject, summary, category, priority)
-            VALUES (%s, %s, %s, %s)
+            VALUES (?, ?, ?, ?)
             """,
             ("AI Email", result["summary"], result["category"], "Normal"),
         )

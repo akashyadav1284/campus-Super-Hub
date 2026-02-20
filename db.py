@@ -1,15 +1,14 @@
 """
 Database connection for AIfusion / Campus Hub.
-Uses MySQL. Set env vars DB_HOST, DB_USER, DB_PASSWORD, DB_NAME to override defaults.
+Uses SQLite for zero-config portable deployment.
 """
+import sqlite3
 import os
-import mysql.connector
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "campus_hub.db")
 
 def get_connection():
-    return mysql.connector.connect(
-        host=os.environ.get("DB_HOST", "localhost"),
-        user=os.environ.get("DB_USER", "root"),
-        password=os.environ.get("DB_PASSWORD", ""),
-        database=os.environ.get("DB_NAME", "campus_hub"),
-    )
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn

@@ -1,32 +1,22 @@
 """
-Initialize the campus_hub database and tables.
+Initialize the campus_hub database and tables using SQLite.
 Run once: python init_db.py
-Requires MySQL running with user/password from db.py (or env vars).
 """
+import sqlite3
 import os
-import mysql.connector
 
-DB_HOST = os.environ.get("DB_HOST", "localhost")
-DB_USER = os.environ.get("DB_USER", "root")
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
-DB_NAME = os.environ.get("DB_NAME", "campus_hub")
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "campus_hub.db")
 
 def main():
-    print("Connecting to MySQL (without database)...")
-    conn = mysql.connector.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASSWORD,
-    )
+    print("Connecting to SQLite database...")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{DB_NAME}`")
-    print(f"Database '{DB_NAME}' ready.")
-    cursor.execute(f"USE `{DB_NAME}`")
+    print("Database ready.")
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS email_summaries (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             subject VARCHAR(500) NOT NULL,
             summary TEXT NOT NULL,
             category VARCHAR(50) NOT NULL,
@@ -38,7 +28,7 @@ def main():
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS mess_menu (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             day_of_week VARCHAR(20) NOT NULL,
             meal_type VARCHAR(20) NOT NULL,
             items TEXT NOT NULL,
@@ -51,7 +41,6 @@ def main():
     cursor.close()
     conn.close()
     print("Done. You can start the API with: uvicorn main:app --reload")
-
 
 if __name__ == "__main__":
     main()
